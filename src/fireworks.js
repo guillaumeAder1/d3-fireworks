@@ -12,14 +12,12 @@ function Stage(params){
     var bulletGroup;
     var uuid = 0
     this.createSvg = function(){
-        stage = d3.select('#svg').append('svg')
-            // .style('width', "500px")
-            // .style('height', height + "px")
+        stage = d3.select('#svg').append('svg')         
             .style('width', "100vw")
             .style('height', "100vh")
             .style('background-color', "lightgray");
         bulletGroup = stage.append('g').attr('id', 'bullet')
-        stage.on('touchstart, click',this.createFire);
+        stage.on('touchstart',this.createFire);
 
     };
 
