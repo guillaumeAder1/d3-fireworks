@@ -1,11 +1,10 @@
-
 var fireWorks = {
     name: "toto",
     createSvg: function(){
         console.log(this.name, 'createSvg')
     }
 }
-
+//https://blog.madewithenvy.com/getting-started-with-webpack-2-ed2b86c68783
 function Stage(params){
     var height = 500;
     var width = 500;
@@ -14,8 +13,10 @@ function Stage(params){
     var uuid = 0
     this.createSvg = function(){
         stage = d3.select('#svg').append('svg')
-            .style('width', "500px")
-            .style('height', height + "px")
+            // .style('width', "500px")
+            // .style('height', height + "px")
+            .style('width', "100vw")
+            .style('height', "100vh")
             .style('background-color', "lightgray");
         bulletGroup = stage.append('g').attr('id', 'bullet')
         stage.on('click',this.createFire)
@@ -35,7 +36,6 @@ function Stage(params){
                     d3.select(this).remove()
                     blow(this, coord);
                 });
-           
     };
     function calculatPosition(origin, numNodes){
         var res = new Array(numNodes).fill();
@@ -55,8 +55,11 @@ function Stage(params){
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
-    function blow(element, coord, stop){
-        console.log('blow', element)
+
+    function getNumNode(nbr){
+        return ( Math.floor(Math.random() * 10) % 2 === 0 ) ? nbr : nbr * 2;
+    }
+    function blow(element, coord, stop){      
         
         var radius = getRandomInt(10,50);
         var numNodes = getRandomInt(6,12)
@@ -72,11 +75,12 @@ function Stage(params){
         var opacity = getRandomInt(0,6) / 10;
         var rad = getRandomInt(3,6) 
 
-
+        var groupContainer = bulletGroup.append('g').attr('class', 'container')
         function anim(repeat){
             console.log(repeat)
-            var _d = calculatPosition(coord, numNodes);
-            var g =  bulletGroup.append('g')
+            var _d = calculatPosition(coord,getNumNode(numNodes));
+            var g =  groupContainer.append('g').attr('fill', 'green')
+           
             var sel = g.selectAll('circle').data(_d).enter()
             var animation = sel.append('circle')
             .attr('cx', coord[0])
@@ -97,7 +101,23 @@ function Stage(params){
                 // })
             } else {
                 animation.on('end', function(){
-                    d3.select('#bullet').selectAll('g').transition().duration(1000).style('opacity', 0).remove()                    
+                    // d3.select('#bullet').selectAll('g').transition().duration(1000).style('opacity', 0).remove()   
+                  
+                    d3.select('#bullet').select('g.container').each(function(d,i){
+                        
+                        var gPos = d3.select(this).node().getBBox();
+                        var center = [gPos.y + (gPos.height / 2), gPos.x + (gPos.width / 2)];
+                        console.log(center[1], center[0] , gPos)
+                        d3.select(this).selectAll('g').transition().duration(500)
+                        //.attr('transform', 'scale(50, 100) rotate(60 ,' + center[1] + ' ,' + center[0] + ')' )
+                        .attr('transform', 'scale(50, 100)' )
+                       
+
+
+                            console.log(coord)
+                    })
+                    // .transition().duration(1000)
+                    //     .attr('transform', 'rotate(60 250 250)' ).style('opacity', 0).remove()                    
                 })
                 // g.selectAll('circle').transition().duration(250).style('opacity', 0)
                 // g.remove()
@@ -109,51 +129,8 @@ function Stage(params){
             }
 
         }
-        anim( getRandomInt(2,6) )
-        return
-        for (i=0; i<numNodes; i++) { 
-
-            console.log("Mouse posX ", coord[0], "Mouse posY ", coord[1])
-            angle = (i / (numNodes/2)) * Math.PI; // Calculate the angle at which the element will be placed.
-                                                // For a semicircle, we would use (i / numNodes) * Math.PI.
-            console.log(" cos = ", Math.cos(angle), " angle =  ", angle ,"width = " , (width/2));
-            console.log(" sin = ", Math.sin(angle), " angle =  ", angle ,"width ", (width/2));
-            x = (radius * Math.cos(angle)) ; // Calculate 0  the x position of the element.
-            y = (radius * Math.sin(angle)) ; // Calculate the y position of the element.
-          
-            console.log(" X (radius * Math.cos(angle)) = ", x)
-            console.log(" Y (radius * Math.sin(angle)) = ", y)
-            console.log("---------------------")
-           
-            bulletGroup.append('circle')
-                .attr('cx', coord[0])
-                .attr('cy',  coord[1])
-                .attr('r', rad)
-                .style('fill',"red")
-                .style('opacity',opacity)
-                .transition()     
-                    .duration(500)
-                    .attr('cx', coord[0] + x)
-                    .attr('cy',  coord[1] + y)
-                    .on('end', function(d){
-                        if(!stop){
-                            var coord = [parseInt(d3.select(this).attr('cx')), parseInt(d3.select(this).attr('cy'))]
-                            blow(this, coord, true)
-                            console.log(d3.select(this), d, true)
-                            d3.select(this).remove();         
-                        }else{
-                            d3.select(this).remove(); 
-                        }
-                    });
-            nodes.push({'id': i, 'x': x, 'y': y});
-        }
-        console.log(nodes)
-        // nodes.forEach(function(element) {
-        //     bulletGroup.append('circle')
-        //         .attr('cx',  element.x)
-        //         .attr('cy',  element.y)
-        //         .attr('r',4)
-        // }, this);
+        anim( getRandomInt(2,6) )      
+      
     }
 
     this.explode = function(){
