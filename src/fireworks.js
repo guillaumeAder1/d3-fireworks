@@ -17,12 +17,12 @@ function Stage(params){
             .style('height', "100vh")
             .style('background-color', "lightgray");
         bulletGroup = stage.append('g').attr('id', 'bullet')
-        stage.on('touchstart',this.createFire);
+        stage.on('click',this.createFire);
 
     };
 
     this.createFire = function(){
-        alert(d3.event.type)
+        //alert(d3.event.type)
         var coord = d3.mouse(this)
         bulletGroup.append('circle')
             .attr('cx', coord[0])
