@@ -19,22 +19,22 @@ function Stage(params){
             .style('height', "100vh")
             .style('background-color', "lightgray");
         bulletGroup = stage.append('g').attr('id', 'bullet')
-        stage.on('click',this.createFire)
+        stage.on('touchstart, click',this.createFire);
 
     };
 
     this.createFire = function(){
-        console.log(stage.attr('height'))
+        alert(d3.event.type)
         var coord = d3.mouse(this)
         bulletGroup.append('circle')
             .attr('cx', coord[0])
-            .attr('cy', height)
+            .attr('cy', screen.height)
             .attr('r', 3)
             .transition()
-                .attr('cy', coord[1])
+                .attr('cy', coord[1])//.call(blow(coord))
                 .on('end', function(){
                     d3.select(this).remove()
-                    blow(this, coord);
+                    blow(coord);
                 });
     };
     function calculatPosition(origin, numNodes){
@@ -59,8 +59,8 @@ function Stage(params){
     function getNumNode(nbr){
         return ( Math.floor(Math.random() * 10) % 2 === 0 ) ? nbr : nbr * 2;
     }
-    function blow(element, coord, stop){      
-        
+    function blow(coord, stop){      
+        //d3.select(element).remove()
         var radius = getRandomInt(10,50);
         var numNodes = getRandomInt(6,12)
         var nodes = [], 
@@ -110,18 +110,9 @@ function Stage(params){
                         console.log(center[1], center[0] , gPos)
                         d3.select(this).selectAll('g').transition().duration(500)
                         //.attr('transform', 'scale(50, 100) rotate(60 ,' + center[1] + ' ,' + center[0] + ')' )
-                        .attr('transform', 'scale(50, 100)' )
-                       
-
-
-                            console.log(coord)
-                    })
-                    // .transition().duration(1000)
-                    //     .attr('transform', 'rotate(60 250 250)' ).style('opacity', 0).remove()                    
-                })
-                // g.selectAll('circle').transition().duration(250).style('opacity', 0)
-                // g.remove()
-                //.on('end', remove(sel));
+                        .attr('transform', 'scale(50, 100)' );                      
+                    });         
+                });             
             }
             function _remove(el){
                 console.log(el)
